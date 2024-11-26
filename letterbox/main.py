@@ -261,17 +261,27 @@ def main(
     print(f"Padded {number} files. Exiting.")
 
 
-@ cli.callback(invoke_without_command=True)
-def typer_main(
-        files: Annotated[List[str], typer.Option("-f", "--files")] = [],
+@ cli.command(help="Pad a set of files into an output location as specified in <config.ini>.")
+def pad(
+        files: Annotated[List[str], typer.Option(
+            "-f", "--files", help="List of files to pad.")] = [],
         aspect_width: Annotated[float, typer.Option(
-            "-w", "--width", "--aspect-width")] = None,
+            "-w", "--width", "--aspect-width", help="Output aspect width (eg, for a 3:2 image, use 3).")] = None,
         aspect_height: Annotated[float, typer.Option(
-            "-h", "--height", "--aspect-height")] = None,
-        color: Annotated[str, typer.Option("-c", "--color")] = "black",
-        use_gui: Annotated[bool, typer.Option()] = False
+            "-h", "--height", "--aspect-height", help='Output aspect height (eg, for a 3:2 image, use 2).')] = None,
+        color: Annotated[str, typer.Option(
+            "-c", "--color", help="Color of crop bars.")] = "black",
+        use_gui: Annotated[bool, typer.Option(
+            help="Use gui to select files, instead of -f.")] = False,
+        prompt: Annotated[bool, typer.Option(
+            help="Prompt for missing arguments.")] = True
+
 
 ):
+    if (not prompt) and ((files == [] and not use_gui) or aspect_width is None or aspect_height is None):
+        print("Missing or invalid arguments. Try <letterbox pad --help>. ")
+        exit()
+
     main(aspect_width, aspect_height, files, color, use_gui)
 
 
@@ -281,7 +291,7 @@ def click_reset_config():
     return
 
 
-@ cli.command("pad")
+@ cli.command("save")
 def click_add_padding(
     aspect_width: Annotated[float, typer.Argument()],
     aspect_height: Annotated[float, typer.Argument()],

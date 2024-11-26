@@ -1,2 +1,3 @@
 /.venv
 /tests
+/letterbox/__pycache__
